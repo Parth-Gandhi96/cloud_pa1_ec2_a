@@ -30,17 +30,17 @@ public class carReck {
 			DetectLabelsResult result = rekognitionClient.detectLabels(request);
 			List <Label> labels = result.getLabels();
 
-			// final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
+			final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
 
 			for (Label label: labels) {
 				System.out.println(label.getName().equals("Car"));
-				// if(label.getName().equals("Car") && label.getConfidence() > 90){
-				// 	SendMessageRequest sendMessageRequest = new SendMessageRequest(myQueueUrl,
-				// 	photo.substring(0, photo.length()-4));
-				// 	final SendMessageResult sendMessageResult = sqs.sendMessage(sendMessageRequest);
-				// 	System.out.println("Car Detected!");		
-				// 	System.out.println("Sending " +photo+ " to second EC2!");
-				// }
+				if(label.getName().equals("Car") && label.getConfidence() > 90){
+					SendMessageRequest sendMessageRequest = new SendMessageRequest(myQueueUrl,
+					photo.substring(0, photo.length()-4));
+					final SendMessageResult sendMessageResult = sqs.sendMessage(sendMessageRequest);
+					System.out.println("Car Detected!");		
+					System.out.println("Sending " +photo+ " to second EC2!");
+				}
 			}
 			System.out.println();
 	    } catch(AmazonRekognitionException e) {
@@ -60,16 +60,16 @@ public class carReck {
         for (S3ObjectSummary obj : objectListing.getObjectSummaries()) {	
             System.out.println(" - " + obj.getKey() + "  " +
                     "(size = " + obj.getSize() + ")");
-			// detectLabels(obj.getKey());
+			detectLabels(obj.getKey());
 		}
 
-		// System.out.println();
-		// System.out.println("Sending Final msg to queue");
-		// String myQueueUrl = "https://sqs.us-east-1.amazonaws.com/700559207820/cloudpro1";
-		// final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
-		// SendMessageRequest sendMessageRequest = new SendMessageRequest(myQueueUrl,"-1");
+		System.out.println();
+		System.out.println("Sending Final msg to queue");
+		String myQueueUrl = "https://sqs.us-east-1.amazonaws.com/700559207820/cloudpro1";
+		final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
+		SendMessageRequest sendMessageRequest = new SendMessageRequest(myQueueUrl,"-1");
 
-  //       final SendMessageResult sendMessageResult = sqs
-  //               .sendMessage(sendMessageRequest);
+        final SendMessageResult sendMessageResult = sqs
+                .sendMessage(sendMessageRequest);
     }
 }
