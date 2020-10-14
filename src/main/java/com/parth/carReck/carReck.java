@@ -35,7 +35,7 @@ import com.amazonaws.services.rekognition.model.S3Object;
 import java.util.List;
 
 public class carReck {
-
+	public static int id = 1;
 	public static void detectLabels(String photo) throws Exception{
 		//String photo = "1.jpg";
       		String bucket = "njit-cs-643";
@@ -49,32 +49,35 @@ public class carReck {
            	   .withName(photo).withBucket(bucket)))
 		   .withMaxLabels(10)
 		   .withMinConfidence(75F);
-
+		
 	      try {
 		 DetectLabelsResult result = rekognitionClient.detectLabels(request);
 		 List <Label> labels = result.getLabels();
 		
-		 final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
-
-		 //System.out.println("Detected labels forihiiiiiiii " + photo);
+		 AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
+		
+		 System.out.println("Detected labels for " + photo);
 		 for (Label label: labels) {
 			 if(label.getName().equals("Car") && label.getConfidence() > 90){
 			 	SendMessageRequest sendMessageRequest =
                     			new SendMessageRequest(myQueueUrl,
-                           		photo.substring(0, photo.length()-4));
-				//sendMessageRequest.setMessageGroupId("messageGroup1");
-				final SendMessageResult sendMessageResult = sqs
+                           		photo.substring(0, photo.length()-4))
+					.withMessageDeduplicationId(id+"");
+				sendMessageRequest.setMessageGroupId("messageGroup1");
+				SendMessageResult sendMessageResult = sqs
                     			.sendMessage(sendMessageRequest);
 				System.out.println("Car Detected!");		
 				System.out.println("Sending " +photo+ " to second EC2!");
+			 	id++;
 			 }
-		    //System.out.println(label.getName() + ": " + label.getConfidence().toString());
+		    System.out.println(label.getName() + ": " + label.getConfidence().toString());
 			 }
 		 System.out.println();
 	      } catch(AmazonRekognitionException e) {
 		e.printStackTrace();
 		//System.out.println("Error occured while detecting lable for :"+photo);
 	      }
+	      //System.out.println("number of images send:"+id);
 	}
 
 
@@ -99,15 +102,15 @@ public class carReck {
 		detectLabels(obj.getKey());
 		//TimeUnit.SECONDS.sleep(10);		
         }
-
+	System.out.println("total images send:"+id);
 	System.out.println();
 	System.out.println("Sending Final msg to queue");
 	String myQueueUrl = "https://sqs.us-east-1.amazonaws.com/728930872376/pa1.fifo";
 	final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
 	SendMessageRequest sendMessageRequest =
                                         new SendMessageRequest(myQueueUrl,
-                                        "-1");
-	//sendMessageRequest.setMessageGroupId("messageGroup1");
+                                        "-1").withMessageDeduplicationId("-1");
+	sendMessageRequest.setMessageGroupId("messageGroup1");
                                 final SendMessageResult sendMessageResult = sqs
                                         .sendMessage(sendMessageRequest);
     }
