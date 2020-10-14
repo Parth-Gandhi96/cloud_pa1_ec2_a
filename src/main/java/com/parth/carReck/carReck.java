@@ -39,7 +39,7 @@ public class carReck {
 	public static void detectLabels(String photo) throws Exception{
 		//String photo = "1.jpg";
       		String bucket = "njit-cs-643";
-		String myQueueUrl = "https://sqs.us-east-1.amazonaws.com/700559207820/cloudpro1";
+		String myQueueUrl = "https://sqs.us-east-1.amazonaws.com/728930872376/pa1.fifo";
 		//System.out.println("Inside ");
       		AmazonRekognition rekognitionClient = AmazonRekognitionClientBuilder.defaultClient();
 
@@ -86,8 +86,8 @@ public class carReck {
 	//detectLabels();
 
 	AmazonS3 s3 = new AmazonS3Client();
-        Region usWest2 = Region.getRegion(Regions.US_EAST_1);
-        s3.setRegion(usWest2);
+        Region usEast1 = Region.getRegion(Regions.US_EAST_1);
+        s3.setRegion(usEast1);
     	String BUCKETNAME = "njit-cs-643";
         ObjectListing objectListing = s3.listObjects(new ListObjectsRequest()
                 .withBucketName(BUCKETNAME));
@@ -102,7 +102,7 @@ public class carReck {
 
 	System.out.println();
 	System.out.println("Sending Final msg to queue");
-	String myQueueUrl = "https://sqs.us-east-1.amazonaws.com/700559207820/cloudpro1";
+	String myQueueUrl = "https://sqs.us-east-1.amazonaws.com/728930872376/pa1.fifo";
 	final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
 	SendMessageRequest sendMessageRequest =
                                         new SendMessageRequest(myQueueUrl,
