@@ -72,7 +72,8 @@ public class carReck {
 			 }
 		 System.out.println();
 	      } catch(AmazonRekognitionException e) {
-		 e.printStackTrace();
+		e.printStackTrace();
+		//System.out.println("Error occured while detecting lable for :"+photo);
 	      }
 	}
 
@@ -92,7 +93,9 @@ public class carReck {
                 .withBucketName(BUCKETNAME));
         for (S3ObjectSummary obj : objectListing.getObjectSummaries()) {	
             System.out.println(" - " + obj.getKey() + "  " +
-                    "(size = " + obj.getSize() + ")");
+                    "(size = " + obj.getSize() + ")  owner name: "+
+		    (obj.getOwner()!=null?obj.getOwner().toString():"NULL")+
+		    " bucket name: "+(obj.getBucketName()!=null?obj.getBucketName().toString():"NULL"));
 		detectLabels(obj.getKey());
 		//TimeUnit.SECONDS.sleep(10);		
         }
